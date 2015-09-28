@@ -1,0 +1,4 @@
+github.com/larsth/gpsd/duration.go:20:	MarshalJSON	100.0%
+github.com/larsth/gpsd/duration.go:31:	UnmarshalJSON	100.0%
+github.com/larsth/gpsd/fixmode.go:6:	String		100.0%
+total:					(statements)	100.0%
