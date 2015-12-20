@@ -1,5 +1,7 @@
 package gpsdjson
 
+import "github.com/larsth/go-gpsfix"
+
 //TPV is type that  contains a time-position-velocity report.
 //
 //The "class" and "mode" fields will reliably be present.
@@ -27,7 +29,7 @@ type TPV struct {
 	//NMEA mode: %d, 0=no mode value yet seen, 1=no fix, 2=2D, 3=3D.
 	//
 	////Always? Yes. Type: Mode
-	Fix FixMode `json:"mode"`
+	Fix gpsfix.FixMode `json:"mode"`
 
 	//Time/date stamp in ISO8601 format, UTC.
 	//May have a fractional part of up to .001sec precision.
