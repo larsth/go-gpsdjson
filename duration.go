@@ -14,15 +14,29 @@ type Duration struct {
 	time.Duration
 }
 
+////MarshalJSON can marshal itself into valid JSON.
+////
+////MarshalJSON implements interface encoding/json.Marshaler
+//func (d *Duration) MarshalJSON() ([]byte, error) {
+//	f := d.Duration.Seconds()
+//	b := make([]byte, 0, 16)
+//	s := strconv.FormatFloat(f, byte('f'), -1, 64)
+//	b = append(b, s...)
+//	return b, nil
+//}
+
 //MarshalJSON can marshal itself into valid JSON.
 //
 //MarshalJSON implements interface encoding/json.Marshaler
 func (d *Duration) MarshalJSON() ([]byte, error) {
-	f := d.Duration.Seconds()
-	b := make([]byte, 0, 16)
-	s := strconv.FormatFloat(f, byte('f'), -1, 64)
-	b = append(b, s...)
-	return b, nil
+	var buf bytes.Buffer
+
+	ns := d.Duration.Nanoseconds()
+	s := strconv.FormatInt(ns, 10)
+	buf.WriteString(s)
+	buf.WriteString("ns")
+
+	return buf.Bytes(), nil
 }
 
 //UnmarshalJSON can unmarshal a JSON description of itself.
@@ -48,8 +62,8 @@ func (d *Duration) UnmarshalJSON(data []byte) error {
 		strings.HasSuffix(str, "m") || strings.HasSuffix(str, "h"))
 
 	if false == hasUnitSuffix {
-		//assume seconds (written by the MarshalJSON method)
-		buf.Write([]byte("s"))
+		//assume seconds
+		buf.WriteString("s")
 	}
 
 	if duration, err = time.ParseDuration(buf.String()); err != nil {

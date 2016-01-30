@@ -13,8 +13,14 @@ func TestDurationMarshalJSON(t *testing.T) {
 		input        *Duration     = &Duration{Duration: timeDuration}
 		gotBytes     []byte
 		gotErr       error
-		wantBytes    []byte = []byte{0x36, 0x34} //=64 in ASCII/UTF-8 with MSb=0
-		wantErr      error  = nil
+		//wantBytes: `64000000000ns`
+		wantBytes = []byte{
+			0x36, 0x34,
+			0x30, 0x30, 0x30,
+			0x30, 0x30, 0x30,
+			0x30, 0x30, 0x30,
+			0x6e, 0x73}
+		wantErr error = nil
 
 		hadFailed bool
 		s         string
@@ -103,9 +109,10 @@ func TestDurationUnmarshalJSON(t *testing.T) {
 
 		hadFailed bool
 		s         string
+		testItem  *tdTDurationUnmarshalJSON
 		i         int
 	)
-	for _, testItem := range tdDurationUnmarshalJSONWant {
+	for i, testItem = range tdDurationUnmarshalJSONWant {
 		d = &Duration{}
 		gotErr = d.UnmarshalJSON(testItem.Input)
 		hadFailed, s = tstCheckErr("returned error", gotErr, testItem.WantErr)
