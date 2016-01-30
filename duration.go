@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/juju/errors"
 )
 
 //Duration is a type that embeds time.Duration, and has support for JSON.
@@ -13,17 +15,6 @@ import (
 type Duration struct {
 	time.Duration
 }
-
-////MarshalJSON can marshal itself into valid JSON.
-////
-////MarshalJSON implements interface encoding/json.Marshaler
-//func (d *Duration) MarshalJSON() ([]byte, error) {
-//	f := d.Duration.Seconds()
-//	b := make([]byte, 0, 16)
-//	s := strconv.FormatFloat(f, byte('f'), -1, 64)
-//	b = append(b, s...)
-//	return b, nil
-//}
 
 //MarshalJSON can marshal itself into valid JSON.
 //
@@ -47,17 +38,20 @@ func (d *Duration) UnmarshalJSON(data []byte) error {
 		str           string
 		hasUnitSuffix bool
 		err           error
-		duration      time.Duration
 		buf           bytes.Buffer
 	)
 
 	if data == nil {
-		return ErrNilByteSlice
+		return errors.Trace(ErrNilByteSlice)
 	}
 	if len(data) == 0 {
-		return ErrEmptyByteSlice
+		return errors.Trace(ErrEmptyByteSlice)
 	}
+
 	str = strings.TrimSpace(string(data))
+	if len(str) == 0 {
+		return errors.Trace(ErrEmptyString)
+	}
 	buf.WriteString(str)
 
 	//"300ms", "-1.5h" or "2h45m".
@@ -69,12 +63,14 @@ func (d *Duration) UnmarshalJSON(data []byte) error {
 
 	if false == hasUnitSuffix {
 		//assume seconds
+		if _, err = strconv.ParseInt(str, 10, 64); err != nil {
+			return errors.Annotate(err, "Not an integer")
+		}
 		buf.WriteString("s")
 	}
 
-	if duration, err = time.ParseDuration(buf.String()); err != nil {
-		return err
+	if d.Duration, err = time.ParseDuration(buf.String()); err != nil {
+		return errors.Annotate(err, "time.ParseDuration(string) error")
 	}
-	d.Duration = duration
 	return nil
 }

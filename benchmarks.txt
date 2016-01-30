@@ -1,4 +1,0 @@
-PASS
-BenchmarkDurationMarshalJSON-2  	 1000000	      1806 ns/op
-BenchmarkDurationUnmarshalJSON-2	 1000000	      2951 ns/op
-ok  	github.com/larsth/go-gpsdjson	5.691s

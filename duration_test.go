@@ -1,6 +1,7 @@
 package gpsdjson
 
 import (
+	"fmt"
 	"strconv"
 	"testing"
 )
@@ -98,6 +99,40 @@ var tdDurationUnmarshalJSONWant = []*tdTDurationUnmarshalJSON{
 		Input:        []byte("30"),
 		WantErr:      nil,
 		WantDuration: time.Second * 30,
+	},
+	//[9]
+	&tdTDurationUnmarshalJSON{
+		/*a nil input will create a "s" as the only input to the
+		time.ParseDuration function */
+		Input:        []byte{},
+		WantErr:      ErrEmptyByteSlice,
+		WantDuration: time.Second * 0,
+	},
+	//[10]
+	&tdTDurationUnmarshalJSON{
+		/*a nil input will create a "s" as the only input to the
+		time.ParseDuration function */
+		Input:        []byte("  "),
+		WantErr:      ErrEmptyString,
+		WantDuration: time.Second * 0,
+	},
+	//[11]
+	&tdTDurationUnmarshalJSON{
+		/*a nil input will create a "s" as the only input to the
+		time.ParseDuration function */
+		Input: []byte("a"),
+		WantErr: fmt.Errorf("%s",
+			"Not an integer: strconv.ParseInt: parsing \"a\": invalid syntax"),
+		WantDuration: time.Second * 0,
+	},
+	//[12]
+	&tdTDurationUnmarshalJSON{
+		/*a nil input will create a "s" as the only input to the
+		time.ParseDuration function */
+		Input: []byte("s"),
+		WantErr: fmt.Errorf("%s",
+			"time.ParseDuration(string) error: time: invalid duration s"),
+		WantDuration: time.Second * 0,
 	},
 }
 
