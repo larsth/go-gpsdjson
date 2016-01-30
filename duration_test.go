@@ -1,7 +1,6 @@
 package gpsdjson
 
 import (
-	"errors"
 	"strconv"
 	"testing"
 )
@@ -49,7 +48,7 @@ var tdDurationUnmarshalJSONWant = []*tdTDurationUnmarshalJSON{
 		/*a nil input will create a "s" as the only input to the
 		time.ParseDuration function */
 		Input:        nil,
-		WantErr:      errors.New("time: invalid duration s"),
+		WantErr:      ErrNilByteSlice,
 		WantDuration: time.Second * 0,
 	},
 	//[1]

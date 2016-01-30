@@ -51,6 +51,12 @@ func (d *Duration) UnmarshalJSON(data []byte) error {
 		buf           bytes.Buffer
 	)
 
+	if data == nil {
+		return ErrNilByteSlice
+	}
+	if len(data) == 0 {
+		return ErrEmptyByteSlice
+	}
 	str = strings.TrimSpace(string(data))
 	buf.WriteString(str)
 
