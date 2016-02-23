@@ -10,7 +10,7 @@ import "time"
 func TestDurationMarshalJSON(t *testing.T) {
 	var (
 		timeDuration time.Duration = 64 * time.Second
-		input        *Duration     = &Duration{Duration: timeDuration}
+		input        *Duration     = &Duration{D: timeDuration}
 		gotBytes     []byte
 		gotErr       error
 		//wantBytes: `64000000000ns`
@@ -43,7 +43,7 @@ type tdTDurationUnmarshalJSON struct {
 	WantDuration time.Duration
 }
 
-var tdDurationUnmarshalJSONWant = []*tdTDurationUnmarshalJSON{
+var tdDurationUnmarshalJSON = []*tdTDurationUnmarshalJSON{
 	//[0]
 	&tdTDurationUnmarshalJSON{
 		/*a nil input will create a "s" as the only input to the
@@ -54,84 +54,139 @@ var tdDurationUnmarshalJSONWant = []*tdTDurationUnmarshalJSON{
 	},
 	//[1]
 	&tdTDurationUnmarshalJSON{
-		Input:        []byte("12ns"),
+		Input:        []byte(`12ns`),
 		WantErr:      nil,
 		WantDuration: time.Nanosecond * 12,
 	},
 	//[2]
 	&tdTDurationUnmarshalJSON{
-		Input:        []byte("23us"),
+		Input:        []byte(`"ticker-duration":"12ns"`),
 		WantErr:      nil,
-		WantDuration: time.Microsecond * 23,
+		WantDuration: time.Nanosecond * 12,
 	},
 	//[3]
 	&tdTDurationUnmarshalJSON{
-		Input:        []byte("34µs"),
+		Input:        []byte(`23us`),
 		WantErr:      nil,
-		WantDuration: time.Microsecond * 34,
+		WantDuration: time.Microsecond * 23,
 	},
 	//[4]
 	&tdTDurationUnmarshalJSON{
-		Input:        []byte("46ms"),
+		Input:        []byte(`"ticker-duration":"23us"`),
 		WantErr:      nil,
-		WantDuration: time.Millisecond * 46,
+		WantDuration: time.Microsecond * 23,
 	},
 	//[5]
 	&tdTDurationUnmarshalJSON{
-		Input:        []byte("67s"),
+		Input:        []byte(`34µs`),
 		WantErr:      nil,
-		WantDuration: time.Second * 67,
+		WantDuration: time.Microsecond * 34,
 	},
 	//[6]
 	&tdTDurationUnmarshalJSON{
-		Input:        []byte("78m"),
+		Input:        []byte(`"ticker-duration":"34µs"`),
 		WantErr:      nil,
-		WantDuration: time.Minute * 78,
+		WantDuration: time.Microsecond * 34,
 	},
 	//[7]
 	&tdTDurationUnmarshalJSON{
-		Input:        []byte("90h"),
+		Input:        []byte(`46ms`),
 		WantErr:      nil,
-		WantDuration: time.Hour * 90,
+		WantDuration: time.Millisecond * 46,
 	},
 	//[8]
 	&tdTDurationUnmarshalJSON{
-		Input:        []byte("30"),
+		Input:        []byte(`"ticker-duration":"46ms"`),
 		WantErr:      nil,
-		WantDuration: time.Second * 30,
+		WantDuration: time.Millisecond * 46,
 	},
 	//[9]
 	&tdTDurationUnmarshalJSON{
-		/*a nil input will create a "s" as the only input to the
-		time.ParseDuration function */
-		Input:        []byte{},
-		WantErr:      ErrEmptyByteSlice,
-		WantDuration: time.Second * 0,
+		Input:        []byte(`34µs`),
+		WantErr:      nil,
+		WantDuration: time.Microsecond * 34,
 	},
 	//[10]
 	&tdTDurationUnmarshalJSON{
-		/*a nil input will create a "s" as the only input to the
-		time.ParseDuration function */
+		Input:        []byte(`"ticker-duration":"34µs"`),
+		WantErr:      nil,
+		WantDuration: time.Microsecond * 34,
+	},
+	//[11]
+	&tdTDurationUnmarshalJSON{
+		Input:        []byte(`67s`),
+		WantErr:      nil,
+		WantDuration: time.Second * 67,
+	},
+	//[12]
+	&tdTDurationUnmarshalJSON{
+		Input:        []byte(`"ticker-duration":"67s"`),
+		WantErr:      nil,
+		WantDuration: time.Second * 67,
+	},
+	//[13]
+	&tdTDurationUnmarshalJSON{
+		Input:        []byte(`78m`),
+		WantErr:      nil,
+		WantDuration: time.Minute * 78,
+	},
+	//[14]
+	&tdTDurationUnmarshalJSON{
+		Input:        []byte(`"ticker-duration":"78m"`),
+		WantErr:      nil,
+		WantDuration: time.Minute * 78,
+	},
+	//[15]
+	&tdTDurationUnmarshalJSON{
+		Input:        []byte(`90h`),
+		WantErr:      nil,
+		WantDuration: time.Hour * 90,
+	},
+	//[16]
+	&tdTDurationUnmarshalJSON{
+		Input:        []byte(`"ticker-duration":"90h"`),
+		WantErr:      nil,
+		WantDuration: time.Hour * 90,
+	},
+	//[17]
+	&tdTDurationUnmarshalJSON{
+		Input:        []byte(`30`),
+		WantErr:      nil,
+		WantDuration: time.Second * 30,
+	},
+	//[18]
+	&tdTDurationUnmarshalJSON{
+		Input:        []byte(`"ticker-duration":"30"`),
+		WantErr:      nil,
+		WantDuration: time.Second * 30,
+	},
+	//[19]
+	&tdTDurationUnmarshalJSON{
+		/*is whitespace trimmed (removed)?, if successful, then yes.*/
 		Input:        []byte("  "),
 		WantErr:      ErrEmptyString,
 		WantDuration: time.Second * 0,
 	},
-	//[11]
+	//[20]
 	&tdTDurationUnmarshalJSON{
-		/*a nil input will create a "s" as the only input to the
-		time.ParseDuration function */
+		/*value 'a' is not valid input: Test the returned error. */
 		Input: []byte("a"),
 		WantErr: fmt.Errorf("%s",
-			"Not an integer: strconv.ParseInt: parsing \"a\": invalid syntax"),
+			`strconv.ParseInt: parsing "a": invalid syntax`),
 		WantDuration: time.Second * 0,
 	},
-	//[12]
+	//[21]
 	&tdTDurationUnmarshalJSON{
-		/*a nil input will create a "s" as the only input to the
-		time.ParseDuration function */
-		Input: []byte("s"),
-		WantErr: fmt.Errorf("%s",
-			"time.ParseDuration(string) error: time: invalid duration s"),
+		/*value 's' is not valid input: Test the returned error. */
+		Input:        []byte("s"),
+		WantErr:      fmt.Errorf("%s", `time: invalid duration s`),
+		WantDuration: time.Second * 0,
+	},
+	//[22]
+	&tdTDurationUnmarshalJSON{
+		/*The empty string '' is not valid input: Test the returned error. */
+		Input:        []byte(``),
+		WantErr:      fmt.Errorf("%s", `non-nil, but empty byte slice`),
 		WantDuration: time.Second * 0,
 	},
 }
@@ -146,17 +201,17 @@ func TestDurationUnmarshalJSON(t *testing.T) {
 		testItem  *tdTDurationUnmarshalJSON
 		i         int
 	)
-	for i, testItem = range tdDurationUnmarshalJSONWant {
+	for i, testItem = range tdDurationUnmarshalJSON {
 		d = &Duration{}
 		gotErr = d.UnmarshalJSON(testItem.Input)
 		hadFailed, s = tstCheckErr("returned error", gotErr, testItem.WantErr)
 		if hadFailed == true {
 			t.Error(s)
 			t.Log("The test error ocurred at test item: "+
-				"tdDurationUnmarshalJSONWant[", strconv.Itoa(i), "].")
+				"tdDurationUnmarshalJSON[", strconv.Itoa(i), "].")
 		}
 		hadFailed, s = tstCheckTimeDuration("calculated time.Duration",
-			d.Duration, testItem.WantDuration)
+			d.D, testItem.WantDuration)
 		if hadFailed == true {
 			t.Error(s)
 			t.Log("The test error ocurred at test item: "+
@@ -166,9 +221,15 @@ func TestDurationUnmarshalJSON(t *testing.T) {
 	}
 }
 
+func TestDurationUnmarshalJSONWithDebugging(t *testing.T) {
+	DebugDurationUnmarshalJSON = true
+	TestDurationUnmarshalJSON(t)
+	DebugDurationUnmarshalJSON = false
+}
+
 func BenchmarkDurationMarshalJSON(b *testing.B) {
 	var d = &Duration{}
-	d.Duration = time.Second * 30
+	d.D = time.Second * 30
 	for i := 0; i < b.N; i++ {
 		_, _ = d.MarshalJSON()
 	}

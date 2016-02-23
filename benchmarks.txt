@@ -1,0 +1,124 @@
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=0
+	 str= 12ns
+	 str2= 
+	 i=0
+	 str3= 12ns
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=23
+	 str= "ticker-duration":"12ns"
+	 str2= "ticker-duration":"12ns
+	 i=19
+	 str3= 12ns
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=0
+	 str= 23us
+	 str2= 
+	 i=0
+	 str3= 23us
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=23
+	 str= "ticker-duration":"23us"
+	 str2= "ticker-duration":"23us
+	 i=19
+	 str3= 23us
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=0
+	 str= 34µs
+	 str2= 
+	 i=0
+	 str3= 34µs
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=24
+	 str= "ticker-duration":"34µs"
+	 str2= "ticker-duration":"34µs
+	 i=19
+	 str3= 34µs
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=0
+	 str= 46ms
+	 str2= 
+	 i=0
+	 str3= 46ms
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=23
+	 str= "ticker-duration":"46ms"
+	 str2= "ticker-duration":"46ms
+	 i=19
+	 str3= 46ms
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=0
+	 str= 34µs
+	 str2= 
+	 i=0
+	 str3= 34µs
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=24
+	 str= "ticker-duration":"34µs"
+	 str2= "ticker-duration":"34µs
+	 i=19
+	 str3= 34µs
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=0
+	 str= 67s
+	 str2= 
+	 i=0
+	 str3= 67s
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=22
+	 str= "ticker-duration":"67s"
+	 str2= "ticker-duration":"67s
+	 i=19
+	 str3= 67s
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=0
+	 str= 78m
+	 str2= 
+	 i=0
+	 str3= 78m
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=22
+	 str= "ticker-duration":"78m"
+	 str2= "ticker-duration":"78m
+	 i=19
+	 str3= 78m
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=0
+	 str= 90h
+	 str2= 
+	 i=0
+	 str3= 90h
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=22
+	 str= "ticker-duration":"90h"
+	 str2= "ticker-duration":"90h
+	 i=19
+	 str3= 90h
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=0
+	 str= 30
+	 str2= 
+	 i=0
+	 str3= 30
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=21
+	 str= "ticker-duration":"30"
+	 str2= "ticker-duration":"30
+	 i=19
+	 str3= 30
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=0
+	 str= a
+	 str2= 
+	 i=0
+	 str3= a
+gpsdjson.*Duration.unmarshalJsonCut:
+	 j=0
+	 str= s
+	 str2= 
+	 i=0
+	 str3= s
+PASS
+BenchmarkDurationMarshalJSON-2  	 1000000	      2483 ns/op
+BenchmarkDurationUnmarshalJSON-2	  500000	      4037 ns/op
+ok  	github.com/larsth/go-gpsdjson	4.579s

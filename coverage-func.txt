@@ -1,3 +1,4 @@
-github.com/larsth/go-gpsdjson/duration.go:22:	MarshalJSON	100.0%
-github.com/larsth/go-gpsdjson/duration.go:36:	UnmarshalJSON	100.0%
-total:						(statements)	100.0%
+github.com/larsth/go-gpsdjson/duration.go:25:	MarshalJSON		100.0%
+github.com/larsth/go-gpsdjson/duration.go:44:	unmarshalJsonCut	100.0%
+github.com/larsth/go-gpsdjson/duration.go:76:	UnmarshalJSON		100.0%
+total:						(statements)		100.0%

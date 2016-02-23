@@ -2,75 +2,118 @@ package gpsdjson
 
 import (
 	"bytes"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
+)
 
-	"github.com/juju/errors"
+var (
+	DebugDurationUnmarshalJSON bool
 )
 
 //Duration is a type that embeds time.Duration, and has support for JSON.
 //
 //The duration is stored in seconds, if marshaled to JSON.
 type Duration struct {
-	time.Duration
+	D time.Duration
 }
 
 //MarshalJSON can marshal itself into valid JSON.
 //
 //MarshalJSON implements interface encoding/json.Marshaler
 func (d *Duration) MarshalJSON() ([]byte, error) {
-	var buf bytes.Buffer
+	var (
+		ns  int64
+		s   string
+		buf bytes.Buffer
+		p   []byte
+	)
 
-	ns := d.Duration.Nanoseconds()
-	s := strconv.FormatInt(ns, 10)
+	ns = d.D.Nanoseconds()
+	s = strconv.FormatInt(ns, 10)
 	buf.WriteString(s)
 	buf.WriteString("ns")
 
-	return buf.Bytes(), nil
+	p = make([]byte, 0, buf.Len())
+	p = append(p, buf.Bytes()...)
+
+	return p, nil
+}
+
+func (d *Duration) unmarshalJsonCut(str string) string {
+	var (
+		count      int
+		i, j       int
+		str2, str3 string
+	)
+
+	count = strings.Count(str, `"`)
+	if count > 0 {
+		j = strings.LastIndex(str, `"`)
+		str2 = str[:j]
+		i = 1 + strings.LastIndex(str2, `"`)
+		str3 = str2[i:]
+	} else {
+		str3 = str
+	}
+
+	if DebugDurationUnmarshalJSON {
+		fmt.Println("gpsdjson.*Duration.unmarshalJsonCut:")
+		fmt.Printf("\t j=%d\n", j)
+		fmt.Println("\t str=", str)
+		fmt.Println("\t str2=", str2)
+		fmt.Printf("\t i=%d\n", i)
+		fmt.Println("\t str3=", str3)
+	}
+
+	return str3
 }
 
 //UnmarshalJSON can unmarshal a JSON description of itself.
 //
 //UnmarshalJSON implements interface encoding/json.Unmarshaler
 func (d *Duration) UnmarshalJSON(data []byte) error {
+	const NA = "N/A"
 	var (
-		str           string
-		hasUnitSuffix bool
-		err           error
-		buf           bytes.Buffer
+		str1, str2 string
+		hasSuffix  bool
+		err        error
+		buf        bytes.Buffer
 	)
 
 	if data == nil {
-		return errors.Trace(ErrNilByteSlice)
+		return ErrNilByteSlice
 	}
 	if len(data) == 0 {
-		return errors.Trace(ErrEmptyByteSlice)
+		return ErrEmptyByteSlice
 	}
 
-	str = strings.TrimSpace(string(data))
-	if len(str) == 0 {
-		return errors.Trace(ErrEmptyString)
+	str1 = strings.TrimSpace(string(data))
+	if len(str1) == 0 {
+		return ErrEmptyString
 	}
-	buf.WriteString(str)
+	str2 = d.unmarshalJsonCut(str1)
+	buf.WriteString(str2)
 
 	//"300ms", "-1.5h" or "2h45m".
 	//Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-	hasUnitSuffix = (strings.HasSuffix(str, "ns") ||
-		strings.HasSuffix(str, "us") || strings.HasSuffix(str, "µs") ||
-		strings.HasSuffix(str, "ms") || strings.HasSuffix(str, "s") ||
-		strings.HasSuffix(str, "m") || strings.HasSuffix(str, "h"))
+	hasSuffix = (strings.HasSuffix(str2, "ns") ||
+		strings.HasSuffix(str2, "us") || strings.HasSuffix(str2, "µs") ||
+		strings.HasSuffix(str2, "ms") || strings.HasSuffix(str2, "s") ||
+		strings.HasSuffix(str2, "m") || strings.HasSuffix(str2, "h"))
 
-	if false == hasUnitSuffix {
-		//assume seconds
-		if _, err = strconv.ParseInt(str, 10, 64); err != nil {
-			return errors.Annotate(err, "Not an integer")
+	if false == hasSuffix {
+		if _, err = strconv.ParseInt(str2, 10, 64); err != nil {
+			return err
 		}
+		//assume seconds
 		buf.WriteString("s")
 	}
 
-	if d.Duration, err = time.ParseDuration(buf.String()); err != nil {
-		return errors.Annotate(err, "time.ParseDuration(string) error")
+	if d.D, err = time.ParseDuration(buf.String()); err != nil {
+		return err
 	}
+
 	return nil
 }
